@@ -5,6 +5,7 @@ stages:
   - build
   - test
   - deploy
+
 workflow:
   rules: 
     - if: '$CI_COMMIT_BRANCH != "main"'
@@ -24,9 +25,8 @@ build:
     - "echo debug CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"
     - docker ps
     - git config --list
-  workflow:
-    rules:
-      - if: '$CI_COMMIT_MESSAGE =~ /build/
+  rules:
+    - if: '$CI_COMMIT_MESSAGE =~ /build/
 
 test:
   stage: test
