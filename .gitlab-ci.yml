@@ -26,7 +26,7 @@ build:
     - docker ps
     - git config --list
   rules:
-    - if: '$CI_COMMIT_MESSAGE =~ /build/
+    - if: '$CI_COMMIT_MESSAGE =~ /build/'
 
 test:
   stage: test
