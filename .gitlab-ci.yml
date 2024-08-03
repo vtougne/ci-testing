@@ -21,8 +21,9 @@ build:
     - "echo debug CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"
     - docker ps
     - git config --list
-  rules:
-    - if: '$CI_COMMIT_MESSAGE =~ /build/ && $CI_COMMIT_BRANCH != "main"'
+  workflow:
+    rules:
+      - if: '$CI_COMMIT_MESSAGE =~ /build/ && $CI_COMMIT_BRANCH != "main"'
 
 test:
   stage: test
