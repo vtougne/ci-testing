@@ -5,6 +5,9 @@ stages:
   - build
   - test
   - deploy
+workflow:
+  rules: 
+    - if: '$CI_COMMIT_BRANCH != "main"'
 
 build:
   stage: build
@@ -23,7 +26,7 @@ build:
     - git config --list
   workflow:
     rules:
-      - if: '$CI_COMMIT_MESSAGE =~ /build/ && $CI_COMMIT_BRANCH != "main"'
+      - if: '$CI_COMMIT_MESSAGE =~ /build/
 
 test:
   stage: test
