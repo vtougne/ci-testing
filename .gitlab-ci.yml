@@ -29,8 +29,8 @@ test:
   image: $CI_REGISTRY_IMAGE:latest
   script:
     - env
-  rules:
-    - if: '$CI_COMMIT_MESSAGE !~ /make_release/ && $CI_COMMIT_BRANCH != "main"'
+  # rules:
+  #   - if: '$CI_COMMIT_MESSAGE !~ /make_release/ && $CI_COMMIT_BRANCH != "main"'
 
 deploy:
   stage: deploy
