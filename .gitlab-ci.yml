@@ -21,8 +21,8 @@ build:
     - "echo debug CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"
     - docker ps
     - git config --list
-  # rules:
-  #   - if: '$CI_COMMIT_MESSAGE =~ /build/ && $CI_COMMIT_BRANCH != "main"'
+  rules:
+    - if: '$CI_COMMIT_MESSAGE =~ /build/ && $CI_COMMIT_BRANCH != "main"'
 
 test:
   stage: test
@@ -42,7 +42,7 @@ deploy:
     - git status
     - git config --global user.email "ci@example.com"
     - git config --global user.name "CI Bot"
-    - git add . && git commit -m "gitlab ci testings" && git push
+    - git add . && git commit -m "${CI_COMMIT_MESSAGE}" && git push
     - export CURRENT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
     - export BASE_TAG=$(echo $CURRENT_TAG | sed -e 's/^v//' -e 's/\.[^.]*$//')
     - export MINOR_VERSION=$(echo $CURRENT_TAG | awk -F. '{print $NF}')
