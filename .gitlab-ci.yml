@@ -1,0 +1,56 @@
+default:
+  tags:
+    - docker
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  image: docker
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker build -t $CI_REGISTRY_IMAGE .
+    - docker push $CI_REGISTRY_IMAGE
+    - "echo debug CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"
+    - docker ps
+    - git config --list
+  # rules:
+  #   - if: '$CI_COMMIT_MESSAGE =~ /build/ && $CI_COMMIT_BRANCH != "main"'
+
+test:
+  stage: test
+  image: $CI_REGISTRY_IMAGE:latest
+  script:
+    - env
+  rules:
+    - if: '$CI_COMMIT_MESSAGE !~ /make_release/ && $CI_COMMIT_BRANCH != "main"'
+
+deploy:
+  stage: deploy
+  image: $CI_REGISTRY_IMAGE:latest
+  script:
+    - git remote set-url origin http://oauth2:${vince_bot_pat}@${CI_SERVER_FQDN}/${CI_PROJECT_PATH}.git
+    - git branch -D $CI_COMMIT_BRANCH || true
+    - git checkout $CI_COMMIT_BRANCH
+    - git status
+    - git config --global user.email "ci@example.com"
+    - git config --global user.name "CI Bot"
+    - git add . && git commit -m "gitlab ci testings" && git push
+    - export CURRENT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+    - export BASE_TAG=$(echo $CURRENT_TAG | sed -e 's/^v//' -e 's/\.[^.]*$//')
+    - export MINOR_VERSION=$(echo $CURRENT_TAG | awk -F. '{print $NF}')
+    - export NEW_MINOR_VERSION=$((MINOR_VERSION + 1))
+    - export NEW_TAG="${BASE_TAG}.${NEW_MINOR_VERSION}"
+    - 'echo "CURRENT_TAG: $CURRENT_TAG"'
+    - 'echo "New tag: $NEW_TAG"'
+    # - git tag $NEW_TAG
+    # - git push origin $NEW_TAG
+  # rules:
+  #   - if: '$CI_COMMIT_MESSAGE =~ /make_release/ && $CI_COMMIT_BRANCH != "main"'
