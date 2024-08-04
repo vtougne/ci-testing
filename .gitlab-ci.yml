@@ -47,7 +47,9 @@ make_release:
     - git status
     - git config --global user.email "ci@example.com"
     - git config --global user.name "CI Bot"
-    - git add . && git commit -m "$(echo ${CI_COMMIT_MESSAGE} | sed 's/make_release//g')" && git push
+    - new_commit_message=$(echo ${CI_COMMIT_MESSAGE} | sed 's/make_release//g')
+    - "echo new_commit_message: $new_commit_message"
+    - git add . && git commit -m "$new_commit_message" && git push
     - current_tag=$(git ls-remote --tags origin | tail -1 | cut -d"/" -f3)
     - current_minor_version=$(echo $current_tag | cut -d"." -f3)
     - current_base_version=$(echo $current_tag | cut -d"." -f1,2)
