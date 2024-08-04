@@ -47,13 +47,17 @@ make_release:
     - git status
     - git config --global user.email "ci@example.com"
     - git config --global user.name "CI Bot"
-    - git add . && git commit -m "${CI_COMMIT_MESSAGE}" && git push
+    - new_commit_message=$(echo ${CI_COMMIT_MESSAGE} | sed 's/make_release//g')
     - current_tag=$(git ls-remote --tags origin | tail -1 | cut -d"/" -f3)
     - current_minor_version=$(echo $current_tag | cut -d"." -f3)
     - current_base_version=$(echo $current_tag | cut -d"." -f1,2)
     - new_minor_version=$((current_minor_version + 1))
     - new_version="${current_base_version}.${new_minor_version}"
-    - git tag $new_version
+    - "echo new_commit_message: $new_commit_message"
+    - echo $new_version > version.txt
+    - echo $new_commit_message > new_commit_message.txt
+    - git add . && git commit -m "$new_commit_message" && git push
+    - git tag $new_version --force
     - git push origin $new_version
   rules: 
     - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE =~ /make_release/'
