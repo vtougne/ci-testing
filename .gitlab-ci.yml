@@ -52,7 +52,7 @@ make_release:
     - current_minor_version=$(echo $current_tag | cut -d"." -f3)
     - current_base_version=$(echo $current_tag | cut -d"." -f1,2)
     - new_minor_version=$((current_minor_version + 1))
-    - new_version = "${current_base_version}.${new_minor_version}"
+    - new_version="${current_base_version}.${new_minor_version}"
     - git tag $new_version
     - git push origin $new_version
   rules: 
