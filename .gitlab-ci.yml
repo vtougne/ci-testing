@@ -35,7 +35,7 @@ test:
   script:
     - env
   rules: 
-    - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE !~ /no_test/'
 
 make_release:
   stage: make_release
@@ -53,7 +53,7 @@ make_release:
     - current_base_version=$(echo $current_tag | cut -d"." -f1,2)
     - new_minor_version=$((current_minor_version + 1))
     - new_version="${current_base_version}.${new_minor_version}"
-    - "echo new_commit_message: $new_commit_message"
+    - "echo new_commit_message: $new_commit_message no_test"
 
     - echo $new_version > version.txt
     - echo $new_commit_message > new_commit_message.txt
