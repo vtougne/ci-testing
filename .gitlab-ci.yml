@@ -55,6 +55,7 @@ make_release:
     - export NEW_TAG="${BASE_TAG}.${NEW_MINOR_VERSION}"
     - 'echo "CURRENT_TAG: $CURRENT_TAG"'
     - 'echo "New tag: $NEW_TAG"'
+    - git-ls-remote --tags origin
     - git tag $NEW_TAG
     - git push origin $NEW_TAG
   rules: 
