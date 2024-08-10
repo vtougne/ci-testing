@@ -6,10 +6,10 @@ stages:
   - test
   - make_release
 
-# workflow:
-#   rules: 
-#     - if: '$CI_COMMIT_BRANCH != "main"'
-      # when: never
+workflow:
+  rules: 
+    - if: '$CI_COMMIT_BRANCH != "main"'
+      when: always
     # - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event"'
 
 build:
@@ -21,7 +21,10 @@ build:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   script:
-      - env
+      - echo "CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"
+      - echo "CI_PIPELINE_SOURCE: $CI_PIPELINE_SOURCE"
+      - echo "CI_COMMIT_BRANCH: $CI_COMMIT_BRANCH"
+      - echo "CI_COMMIT_MESSAGE: $CI_COMMIT_MESSAGE"
     # - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
     # - docker build -t $CI_REGISTRY_IMAGE .
     # - docker push $CI_REGISTRY_IMAGE
@@ -35,7 +38,10 @@ test:
   stage: test
   image: $CI_REGISTRY_IMAGE:latest
   script:
-    - env
+      - echo "CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"
+      - echo "CI_PIPELINE_SOURCE: $CI_PIPELINE_SOURCE"
+      - echo "CI_COMMIT_BRANCH: $CI_COMMIT_BRANCH"
+      - echo "CI_COMMIT_MESSAGE: $CI_COMMIT_MESSAGE"
   # rules: 
   #   - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE !~ /no_test/'
 
@@ -43,25 +49,29 @@ make_release:
   stage: make_release
   image: $CI_REGISTRY_IMAGE:latest
   script:
-    - git remote set-url origin http://oauth2:${vince_bot_pat}@${CI_SERVER_FQDN}/${CI_PROJECT_PATH}.git
-    - git branch -D $CI_COMMIT_BRANCH || true
-    - git checkout $CI_COMMIT_BRANCH
-    - git status
-    - git config --global user.email "ci@example.com"
-    - git config --global user.name "Vince bot"
-    - new_commit_message=$(echo ${CI_COMMIT_MESSAGE} | sed 's/make_release/no_test/g')
-    - current_tag=$(git ls-remote --tags origin | tail -1 | cut -d"/" -f3)
-    - current_minor_version=$(echo $current_tag | cut -d"." -f3)
-    - current_base_version=$(echo $current_tag | cut -d"." -f1,2)
-    - new_minor_version=$((current_minor_version + 1))
-    - new_version="${current_base_version}.${new_minor_version}"
-    - "echo new_commit_message: $new_commit_message"
+      - echo "CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"
+      - echo "CI_PIPELINE_SOURCE: $CI_PIPELINE_SOURCE"
+      - echo "CI_COMMIT_BRANCH: $CI_COMMIT_BRANCH"
+      - echo "CI_COMMIT_MESSAGE: $CI_COMMIT_MESSAGE"
+    # - git remote set-url origin http://oauth2:${vince_bot_pat}@${CI_SERVER_FQDN}/${CI_PROJECT_PATH}.git
+    # - git branch -D $CI_COMMIT_BRANCH || true
+    # - git checkout $CI_COMMIT_BRANCH
+    # - git status
+    # - git config --global user.email "ci@example.com"
+    # - git config --global user.name "Vince bot"
+    # - new_commit_message=$(echo ${CI_COMMIT_MESSAGE} | sed 's/make_release/no_test/g')
+    # - current_tag=$(git ls-remote --tags origin | tail -1 | cut -d"/" -f3)
+    # - current_minor_version=$(echo $current_tag | cut -d"." -f3)
+    # - current_base_version=$(echo $current_tag | cut -d"." -f1,2)
+    # - new_minor_version=$((current_minor_version + 1))
+    # - new_version="${current_base_version}.${new_minor_version}"
+    # - "echo new_commit_message: $new_commit_message"
 
-    - echo $new_version > version.txt
-    - echo $new_commit_message > new_commit_message.txt
-    - git add . && git commit -m "$new_commit_message" && git push
-    - git tag $new_version --force
-    - git push origin $new_version
+    # - echo $new_version > version.txt
+    # - echo $new_commit_message > new_commit_message.txt
+    # - git add . && git commit -m "$new_commit_message" && git push
+    # - git tag $new_version --force
+    # - git push origin $new_version
 
   # rules: 
   #   - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE =~ /make_release/'
