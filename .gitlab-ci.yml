@@ -5,11 +5,12 @@ stages:
   - build
   - test
   - make_release
-  - deploy
+  # - deploy
 
-# workflow:
-#   rules: 
-#     - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event"'
+workflow:
+  rules: 
+    - if: '$CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+#     - if: '$CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event"'
 
 build:
   stage: build
@@ -27,15 +28,16 @@ build:
     - docker ps
     - git config --list
   rules: 
-    - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE =~ /build/'
+    - if: CI_COMMIT_MESSAGE =~ /build/
+    # - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE =~ /build/'
 
 test:
   stage: test
   image: $CI_REGISTRY_IMAGE:latest
   script:
     - env
-  rules: 
-    - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE !~ /no_test/'
+  # rules: 
+  #   - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE !~ /no_test/'
 
 make_release:
   stage: make_release
@@ -62,13 +64,14 @@ make_release:
     - git push origin $new_version
 
   rules: 
-    - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE =~ /make_release/'
+    # - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE =~ /make_release/'
+    - when: manual
 
-deploy:
-  stage: deploy
-  image: $CI_REGISTRY_IMAGE:latest
-  script:
-    - env
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TITLE =~ /^Merge branch.*/'
-      when: manual
+# deploy:
+#   stage: deploy
+#   image: $CI_REGISTRY_IMAGE:latest
+#   script:
+#     - env
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TITLE =~ /^Merge branch.*/'
+#       when: manual
