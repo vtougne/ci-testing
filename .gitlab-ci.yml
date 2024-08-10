@@ -1,10 +1,10 @@
 default:
   tags:
     - docker
-stages:
-  - build_image
-  - test
-  - make_release
+# stages:
+#   - build_image
+#   - test
+#   - make_release
   # - deploy
 
 workflow:
