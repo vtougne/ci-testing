@@ -21,10 +21,10 @@ build:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   script:
-      - 'echo "CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"'
-      - 'echo "CI_PIPELINE_SOURCE: $CI_PIPELINE_SOURCE"'
-      - 'echo "CI_COMMIT_BRANCH: $CI_COMMIT_BRANCH"'
-      - 'echo "CI_COMMIT_MESSAGE: $CI_COMMIT_MESSAGE"'
+    - 'echo "CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"'
+    - 'echo "CI_PIPELINE_SOURCE: $CI_PIPELINE_SOURCE"'
+    - 'echo "CI_COMMIT_BRANCH: $CI_COMMIT_BRANCH"'
+    - 'echo "CI_COMMIT_MESSAGE: $CI_COMMIT_MESSAGE"'
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
     - docker build -t $CI_REGISTRY_IMAGE .
     - docker push $CI_REGISTRY_IMAGE
