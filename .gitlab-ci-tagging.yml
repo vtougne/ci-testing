@@ -5,12 +5,11 @@ stages:
   - build
   - test
   - make_release
+  - deploy
 
 # workflow:
 #   rules: 
-#     - if: '$CI_COMMIT_BRANCH != "main"'
-      # when: never
-    # - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event"'
+#     - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event"'
 
 build:
   stage: build
@@ -21,23 +20,22 @@ build:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   script:
-      - env
-    # - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
-    # - docker build -t $CI_REGISTRY_IMAGE .
-    # - docker push $CI_REGISTRY_IMAGE
-    # - "echo debug CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"
-    # - docker ps
-    # - git config --list
-  # rules: 
-  #   - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE =~ /build/'
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker build -t $CI_REGISTRY_IMAGE .
+    - docker push $CI_REGISTRY_IMAGE
+    - "echo debug CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"
+    - docker ps
+    - git config --list
+  rules: 
+    - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE =~ /build/'
 
 test:
   stage: test
   image: $CI_REGISTRY_IMAGE:latest
   script:
     - env
-  # rules: 
-  #   - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE !~ /no_test/'
+  rules: 
+    - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE !~ /no_test/'
 
 make_release:
   stage: make_release
@@ -63,6 +61,14 @@ make_release:
     - git tag $new_version --force
     - git push origin $new_version
 
-  # rules: 
-  #   - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE =~ /make_release/'
+  rules: 
+    - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE =~ /make_release/'
 
+deploy:
+  stage: deploy
+  image: $CI_REGISTRY_IMAGE:latest
+  script:
+    - env
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TITLE =~ /^Merge branch.*/'
+      when: manual
