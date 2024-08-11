@@ -3,16 +3,13 @@ default:
     - docker
 stages:
   - build
-  # - test
+  - test
   - make_release
 
 workflow:
   rules: 
     - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_COMMIT_MESSAGE !~ /adding version/'
       when: always
-    # - if: '$CI_COMMIT_MESSAGE !~ /adding version/'
-    #   when: never
-    # - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event"'
 
 build:
   stage: build
@@ -23,44 +20,16 @@ build:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   script:
-    - env
-    - 'echo "CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"'
-    - 'echo "CI_PIPELINE_SOURCE: $CI_PIPELINE_SOURCE"'
-    - 'echo "CI_COMMIT_BRANCH: $CI_COMMIT_BRANCH"'
-    - 'echo "CI_COMMIT_MESSAGE: $CI_COMMIT_MESSAGE"'
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
     - docker build -t $CI_REGISTRY_IMAGE .
     - docker push $CI_REGISTRY_IMAGE
-    - "echo debug CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"
-    - docker ps
-    - git config --list
   rules: 
     - if: '$CI_COMMIT_MESSAGE !~ /no_build/'
-    # && $CI_COMMIT_MESSAGE !~ /adding version/'
-
-  # rules: 
-  #   - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE =~ /build/'
-
-# test:
-#   stage: test
-#   image: $CI_REGISTRY_IMAGE:latest
-#   script:
-#       - 'echo "CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"'
-#       - 'echo "CI_PIPELINE_SOURCE: $CI_PIPELINE_SOURCE"'
-#       - 'echo "CI_COMMIT_BRANCH: $CI_COMMIT_BRANCH"'
-#       - 'echo "CI_COMMIT_MESSAGE: $CI_COMMIT_MESSAGE"'
-  # rules: 
-  #   - if: '$CI_COMMIT_BRANCH != "main" &&  $CI_COMMIT_TAG != "null" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_MESSAGE !~ /no_test/'
 
 make_release:
   stage: make_release
   image: $CI_REGISTRY_IMAGE:latest
   script:
-    - env
-    - 'echo "CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE"'
-    - 'echo "CI_PIPELINE_SOURCE: $CI_PIPELINE_SOURCE"'
-    - 'echo "CI_COMMIT_BRANCH: $CI_COMMIT_BRANCH"'
-    - 'echo "CI_COMMIT_MESSAGE: $CI_COMMIT_MESSAGE"'
     - mkdir ../release || true
     - cd ../release
     - rm -rf *
@@ -68,15 +37,8 @@ make_release:
     - git config --global user.email "vincebot@vince.com"
     - git config --global user.name "Vince bot"
     - cd $CI_PROJECT_NAME
-    - ls -lrta
-    - git branch -a
-    - git ls-remote --tags origin
     - cat version.txt
-    - pwd
-    - git status
     - git switch ${CI_COMMIT_BRANCH}
-    # - git branch -D ${CI_COMMIT_BRANCH}_vesionned || true
-    # - git checkout -b ${CI_COMMIT_BRANCH}_vesionned
     - current_tag=$(git ls-remote --tags origin | tail -1 | cut -d"/" -f3)
     - current_minor_version=$(echo $current_tag | cut -d"." -f3)
     - current_base_version=$(echo $current_tag | cut -d"." -f1,2)
@@ -84,20 +46,14 @@ make_release:
     - new_version="${current_base_version}.${new_minor_version}"
     - echo $new_version > version.txt
     - git add .
-    # - git commit -m "${CI_COMMIT_MESSAGE}_vesionned"
-    # - git push -f origin ${CI_COMMIT_BRANCH}_vesionned
     - git commit -m "${CI_COMMIT_MESSAGE} adding version ${new_version}"
     - git push -f origin ${CI_COMMIT_BRANCH}
     - git switch main
     - git pull origin main
     - git merge ${CI_COMMIT_BRANCH}
-    # - git merge ${CI_COMMIT_BRANCH}_vesionned
     - git push origin main
     - git tag $new_version
     - git push origin $new_version
     - git branch -D ${CI_COMMIT_BRANCH} || true
 
-
-  # rules: 
-  #   - if: '$CI_COMMIT_MESSAGE !~ /adding version/'
 
