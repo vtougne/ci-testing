@@ -52,7 +52,7 @@ make_release:
     - git pull origin main
     - git merge ${CI_COMMIT_BRANCH}
     - git push origin main
-    - git tag $new_version
+    - git tag -f $new_version
     - git push origin $new_version
     - git branch -D ${CI_COMMIT_BRANCH} || true
 
