@@ -56,4 +56,3 @@ make_release:
     - git push origin $new_version
     - git branch -D ${CI_COMMIT_BRANCH} || true
 
-
