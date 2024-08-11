@@ -1,1 +1,1 @@
-current
+refs/tags/1.2.11
