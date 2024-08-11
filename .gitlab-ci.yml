@@ -39,7 +39,7 @@ make_release:
     - cd $CI_PROJECT_NAME
     - cat version.txt
     - git switch ${CI_COMMIT_BRANCH}
-    - current_tag=$(git for-each-ref --sort=creatordate --format '%(refname)' refs/tags | tail -1)
+    - current_tag=$(git for-each-ref --sort=creatordate --format '%(refname)' refs/tags | tail -1 | cut -d"/" -f3)
     - current_minor_version=$(echo $current_tag | cut -d"." -f3)
     - current_base_version=$(echo $current_tag | cut -d"." -f1,2)
     - new_minor_version=$((current_minor_version + 1))
