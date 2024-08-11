@@ -22,7 +22,7 @@ create branch add_version:
 
  ``` mermaid
     flowchart LR
-    Start --> Stop
+    A[on git push\nget last version] --> B[get last version]
 
 
   ```
