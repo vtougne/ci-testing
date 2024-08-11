@@ -1,7 +1,5 @@
 # ci-testing
 
-
-
 ```
 on push branch different from main:
   - test
