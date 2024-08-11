@@ -22,7 +22,8 @@ create branch add_version:
 
  ``` mermaid
     flowchart LR
-    A[on git push\nget last version] --> B[get last version]
+    A[on git push\nget last version] --> B[add new version to text file]
+    B --> C[tag with same version]
 
 
   ```

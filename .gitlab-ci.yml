@@ -55,4 +55,3 @@ make_release:
     - git tag -f $new_version
     - git push origin $new_version
     - git push -d origin ${CI_COMMIT_BRANCH}
-
