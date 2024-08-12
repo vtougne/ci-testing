@@ -98,7 +98,7 @@ deploy:
     - cd ../release/$CI_PROJECT_NAME
     - new_version=$(cat version.txt)
     - echo $new_version
+    - sleep 2000
     - git remote set-url origin git@github.com:vtougne/ci-testing.git
     - git push origin $new_version
     - git push -f origin main
-    - sleep 2000
