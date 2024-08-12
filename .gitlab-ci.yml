@@ -6,6 +6,7 @@ stages:
   - prepare_env
   - test
   - make_release
+  - deploy
 
 workflow:
   rules: 
@@ -83,3 +84,16 @@ make_release:
     - git tag -f $new_version
     - git push origin $new_version
     - git push -d origin ${CI_COMMIT_BRANCH}
+
+
+deploy:
+  stage: deploy
+  image: $CI_REGISTRY_IMAGE:latest
+  variables:
+    SECURE_FILES_DOWNLOAD_PATH: '.ssh'
+  script:
+    - cd ../release/$CI_PROJECT_NAME
+    - git remote set-url origin git@github.com:vtougne/ci-testing.git
+    - new_version=$(cat version.txt)
+    - git push origin $new_version
+    - git push -f origin main
