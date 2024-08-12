@@ -45,6 +45,9 @@ prepare_env:
     - mkdir -p /root/.ssh
     - cp -p /builds/root/ci-testing/keys/vince_bot_ssh.priv /root/.ssh/id_rsa
     - cp -p /builds/root/ci-testing/keys/vince_bot_ssh.pub /root/.ssh/id_rsa.pub
+    - chmod 600 /root/.ssh/id_rsa
+    - chmod 644 /root/.ssh/id_rsa.pub
+    - ssh-keyscan github.com >> /root/.ssh/known_hosts
     # - cd /root/.ssh
     # - ls -lrta /builds/root/ci-testing/root/.ssh
     # - ls -lrta  /root/.ssh/vince_bot_ssh.priv
