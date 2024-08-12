@@ -93,7 +93,8 @@ deploy:
     SECURE_FILES_DOWNLOAD_PATH: '.ssh'
   script:
     - cd ../release/$CI_PROJECT_NAME
-    - git remote set-url origin git@github.com:vtougne/ci-testing.git
     - new_version=$(cat version.txt)
+    - echo $new_version
+    - git remote set-url origin git@github.com:vtougne/ci-testing.git
     - git push origin $new_version
     - git push -f origin main
