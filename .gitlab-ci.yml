@@ -100,11 +100,11 @@ deploy:
     - mv vince_bot_ssh.pub id_rsa.pub
     - mv vince_bot_ssh.priv id_rsa
     - chmod -R 600 $HOME/.ssh
-    - env | grep build
+    - ssh-keyscan github.com >> /root/.ssh/known_hosts
     - cd $CI_BUILDS_DIR/root/release/$CI_PROJECT_NAME
     - new_version=$(cat version.txt)
     - echo $new_version
     - git remote set-url origin git@github.com:vtougne/ci-testing.git
-    - sleep 2000
+    # - sleep 2000
     - git push origin $new_version
     - git push -f origin main
