@@ -27,10 +27,7 @@ build:
     - docker build -t $CI_REGISTRY_IMAGE .
     - docker push $CI_REGISTRY_IMAGE
 
-    # - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
-    # - cd $HOME/.ssh
-    # - ls -lrta
-    # - ls -lrta  /root/.ssh/vince_bot_ssh.priv
+
   rules: 
     - if: '$CI_COMMIT_MESSAGE =~ /build_image/'
 
@@ -95,6 +92,11 @@ deploy:
   variables:
     SECURE_FILES_DOWNLOAD_PATH: '.ssh'
   script:
+    - cd $HOME/.ssh
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - ls -lrta
+    - ls -lrta  /root/.ssh/vince_bot_ssh.priv
+
     - cd ../release/$CI_PROJECT_NAME
     - new_version=$(cat version.txt)
     - echo $new_version
