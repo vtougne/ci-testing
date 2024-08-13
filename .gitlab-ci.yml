@@ -84,6 +84,8 @@ make_release:
     - git tag -f $new_version
     - git push origin $new_version
     # - git push -d origin ${CI_COMMIT_BRANCH}
+  # rules: 
+  # - if: '$CI_COMMIT_MESSAGE =~ /build_image/'
 
 
 deploy:
@@ -92,15 +94,17 @@ deploy:
   variables:
     SECURE_FILES_DOWNLOAD_PATH: '.ssh'
   script:
-    - cd $HOME/.ssh
+    - cd $HOME
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
-    - ls -lrta
-    - ls -lrta  /root/.ssh/vince_bot_ssh.priv
-
-    - cd ../release/$CI_PROJECT_NAME
+    - cd $HOME/.ssh
+    - mv vince_bot_ssh.pub id_rsa.pub
+    - mv vince_bot_ssh.priv id_rsa
+    - chmod -R 600 $HOME/.ssh
+    - env | grep build
+    - cd $CI_BUILDS_DIR/root/release/$CI_PROJECT_NAME
     - new_version=$(cat version.txt)
     - echo $new_version
-    - sleep 2000
     - git remote set-url origin git@github.com:vtougne/ci-testing.git
     - git push origin $new_version
     - git push -f origin main
+    - sleep 2000
